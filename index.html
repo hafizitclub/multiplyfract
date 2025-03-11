@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiply Fractions Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        #game-container {
+            border: 6px dashed #333;
+            display: inline-block;
+            padding: 20px;
+            margin-top: 50px;
+            width: 300px;
+        }
+        h1 {
+            font-size: 36px;
+            color: white;
+            text-shadow: 0 0 10px #00f, 0 0 20px #00f, 0 0 30px #00f;
+            animation: glow 3s infinite alternate;
+        }
+        @keyframes glow {
+            0% { text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000; }
+            50% { text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 30px #00ff00; }
+            100% { text-shadow: 0 0 10px #0000ff, 0 0 20px #0000ff, 0 0 30px #0000ff; }
+        }
+        .fraction {
+            display: inline-block;
+            text-align: center;
+            font-size: 24px;
+        }
+        .fraction span {
+            display: block;
+        }
+        .fraction .denominator {
+            border-top: 3px solid black;
+        }
+        .input-fraction {
+            display: inline-block;
+            text-align: center;
+        }
+        .input-fraction input {
+            display: block;
+            width: 60px;
+            text-align: center;
+            margin: 2px auto;
+            font-size: 18px;
+            border: 1px solid black;
+            padding: 5px;
+        }
+        .input-fraction hr {
+            width: 60px;
+            border: 3px solid black;
+            margin: 2px auto;
+        }
+        .submit-button {
+            margin-top: 10px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Multiply Proper Fractions</h1>
+    <div id="game-container">
+        <p><span id="fraction1"></span> × <span id="fraction2"></span></p>
+        <div class="input-fraction">
+            <input type="text" id="num-input" placeholder="?">
+            <hr>
+            <input type="text" id="den-input" placeholder="?">
+        </div>
+        <button class="submit-button" onclick="checkAnswer()">Submit</button>
+        <p id="feedback"></p>
+        <p>Score: <span id="score">0</span></p>
+    </div>
+    
+    <script>
+        let score = 0;
+
+        function getRandomFraction() {
+            let numerator = Math.floor(Math.random() * 9) + 1; // 1-9
+            let denominator = Math.floor(Math.random() * 9) + 2; // 2-10
+            while (numerator >= denominator) {
+                numerator = Math.floor(Math.random() * 9) + 1;
+            }
+            return { numerator, denominator };
+        }
+
+        function gcd(a, b) {
+            return b === 0 ? a : gcd(b, a % b);
+        }
+
+        function simplifyFraction(numerator, denominator) {
+            let divisor = gcd(numerator, denominator);
+            return { numerator: numerator / divisor, denominator: denominator / divisor };
+        }
+
+        function formatFraction(numerator, denominator) {
+            return `<span class='fraction'><span class='numerator'>${numerator}</span><span class='denominator'>${denominator}</span></span>`;
+        }
+
+        function generateQuestion() {
+            let frac1 = getRandomFraction();
+            let frac2 = getRandomFraction();
+
+            document.getElementById("fraction1").innerHTML = formatFraction(frac1.numerator, frac1.denominator);
+            document.getElementById("fraction2").innerHTML = formatFraction(frac2.numerator, frac2.denominator);
+
+            let productNumerator = frac1.numerator * frac2.numerator;
+            let productDenominator = frac1.denominator * frac2.denominator;
+            let simplified = simplifyFraction(productNumerator, productDenominator);
+
+            window.correctNumerator = simplified.numerator;
+            window.correctDenominator = simplified.denominator;
+        }
+
+        function checkAnswer() {
+            let numInput = parseInt(document.getElementById("num-input").value);
+            let denInput = parseInt(document.getElementById("den-input").value);
+
+            if (numInput === window.correctNumerator && denInput === window.correctDenominator) {
+                document.getElementById("feedback").textContent = "Correct!";
+                score++;
+                document.getElementById("score").textContent = score;
+                document.getElementById("num-input").value = "";
+                document.getElementById("den-input").value = "";
+                generateQuestion();
+            } else {
+                document.getElementById("feedback").innerHTML = `Wrong! Try again.`;
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", generateQuestion);
+    </script>
+</body>
+</html>
